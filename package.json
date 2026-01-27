@@ -1,0 +1,31 @@
+{
+  "name": "winn-app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/main/main.js",
+  "scripts": {
+    "prestart": "npx kill-port 3000 || true",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make",
+    "publish": "electron-forge publish"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "qrcode": "^1.5.4",
+    "socket.io": "^4.8.1",
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "@electron-forge/cli": "^7.3.0",
+    "@electron-forge/maker-dmg": "^7.3.0",
+    "@electron-forge/maker-squirrel": "^7.3.0",
+    "electron": "^36.1.0"
+  }
+}

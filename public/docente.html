@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WINN - Docente</title>
+    <link rel="stylesheet" href="./css/globals.css">
+</head>
+
+<body>
+    <h1>WINN - Panel del Docente</h1>
+    <div class="container-grid">
+
+        <!-- Bloque 1: Cuestionarios -->
+        <div class="card" id="cuestionarios">
+            <h2>📋 Cuestionarios</h2>
+            <ul id="listaCuestionarios"></ul>
+
+            <div class="div-en-linea">
+                <label>Cuestionario</label>
+                <input type="text" id="nuevoTitulo" placeholder="Título del cuestionario">
+            </div>
+
+            <div class="div-en-linea">
+                <label>Segundos:</label>
+                <input type="number" id="nuevoTiempo" placeholder="Segundos por pregunta">
+            </div>
+
+            <div class="controls">
+                <button id="agregarCuestionario">➕</button>
+                <button id="editarCuestionario">📝</button>
+                <button id="eliminarCuestionario">➖</button>
+                <button id="guardarCuestionario">💾</button>
+                <button id="refrescarCuestionarios">🔄</button>
+            </div>
+        </div>
+
+        <!-- Bloque 2: Preguntas -->
+        <div class="card" id="preguntas">
+            <h2>❓ Preguntas</h2>
+            <ul id="listaPreguntas"></ul>
+
+            <input type="text" id="nuevoTextoPregunta" placeholder="Texto de la Pregunta">
+
+            <div class="controls">
+                <button id="agregarPregunta">➕</button>
+                <button id="editarPregunta">📝</button>
+                <button id="eliminarPregunta">➖</button>
+                <button id="guardarPregunta">💾</button>
+                <button id="refrescarPreguntas">🔄</button>
+            </div>
+        </div>
+
+        <!-- Bloque 3: Respuestas -->
+        <div class="card" id="respuestas">
+            <h2>🔠 Respuestas</h2>
+
+            <div class="respuesta-linea">
+                <label>A:</label>
+                <input type="text" id="respA">
+                <input type="radio" name="correcta" value="0">
+            </div>
+
+            <div class="respuesta-linea">
+                <label>B:</label>
+                <input type="text" id="respB">
+                <input type="radio" name="correcta" value="0">
+            </div>
+
+            <div class="respuesta-linea">
+                <label>C:</label>
+                <input type="text" id="respC">
+                <input type="radio" name="correcta" value="0">
+            </div>
+
+            <div class="respuesta-linea">
+                <label>D:</label>
+                <input type="text" id="respD">
+                <input type="radio" name="correcta" value="0">
+            </div>
+
+            <div id="formularioRespuestas">
+                <div class="controls">
+                    <button id="guardarRespuestas">💾</button>
+                    <button id="refrescarRespuestas">🔄</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bloque 4: Controles -->
+        <div class="card" id="controles">
+            <h2>🎮 Controles</h2>
+
+            <!-- Bloque 6: Controles -->
+            <div class="botones-controles">
+                <button id="toggleConexiones">🔌 Permitir Conexiones</button>
+                <button id="btnSiguientePregunta">✅ Siguiente Pregunta</button>
+                <button id="btnAbrirProyeccion">🖥️ Abrir Proyección</button>
+                <button id="btnCerrarProyeccion">❌ Cerrar Proyección</button>
+                <button id="btnIniciarLanzamiento">🚀 Iniciar Juego</button>
+                <button id="btnTerminarLanzamiento">🏁 Terminar Juego</button>
+            </div>
+        </div>
+
+        <!-- Bloque 5: Estudiantes Conectados -->
+        <div class="card" id="estudiantes">
+            <h2>👥 Estudiantes Conectados</h2>
+
+            <div class="controls">
+                <label id="linkEstudiantes"></label>
+                <ul id="listaEstudiantes"></ul>
+                <button id="refrescarEstudiantes">🔄</button>
+            </div>
+        </div>
+
+        <!-- Bloque 6: Lanzamientos -->
+        <div class="card" id="lanzamientos">
+            <h2>📊 Lanzamientos Anteriores</h2>
+            <ul id="listaLanzamientos"></ul>
+        </div>
+
+    </div>
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="./js/index.js"></script>
+</body>
+
+</html>

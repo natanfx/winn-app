@@ -1,0 +1,22 @@
+<!-- proyeccion.html -->
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/proyeccion.css" />
+    <title>Proyección</title>
+</head>
+
+<body>
+    <div id="pantalla-espera" class="pantalla-espera">
+        <img id="qrConexion" alt="QR de conexión" />
+        <p id="urlConexion" class="url-texto"></p>
+        <p class="mensaje-espera">Esperando a que se conecten los jugadores...</p>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="./js/proyeccion.js"></script>
+</body>
+
+</html>

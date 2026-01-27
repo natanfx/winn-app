@@ -1,0 +1,305 @@
+/* === RESET Y BASE === */
+body {
+  font-family: "Segoe UI", sans-serif;
+  margin: 0;
+  padding: 0;
+  background: #fef6f0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === TIPOGRAFÍA === */
+h1 {
+  text-align: center;
+  margin: 1rem 0 0.5rem;
+  color: #4e342e;
+}
+
+h2 {
+  display: block;
+  font-size: 1.5em;
+  margin-block-start: 0em;
+  margin-block-end: 0em;
+  margin-inline-start: 0px;
+  margin-inline-end: 0px;
+  font-weight: bold;
+  unicode-bidi: isolate;
+  text-align: center;
+  color: #e65100;
+  border-bottom: 2px solid #ffcc80;
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.5rem;
+}
+
+/* === GRID Y LAYOUT === */
+.container-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 60% 40%;
+  gap: 1rem;
+  padding: 1rem;
+  flex-grow: 1;
+  box-sizing: border-box;
+  max-width: 100%;
+  max-height: 90%;
+}
+
+/* === COMPONENTE: CARD === */
+.card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 100px;
+  transition: none;
+  overflow: hidden;
+}
+
+.card#controles {
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  flex-grow: 1;
+  height: 100%;
+}
+
+.card#controles .botones-controles {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 0.5rem;
+  flex-grow: 1;
+  height: 100%;
+}
+
+.card#controles .botones-controles button {
+  width: 100%;
+  height: 100%;
+  font-size: 1rem;
+  border-radius: 10px;
+  text-align: center;
+  justify-content: center;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: #ef6c00;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.card#controles .botones-controles button:hover {
+  background: #e65100;
+  transform: scale(1.05);
+}
+
+/* === CONTROLES === */
+.card .controls {
+  margin-top: auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+
+.controls button {
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: none;
+  background: #ef6c00;
+  color: white;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.controls button:hover {
+  background: #e65100;
+  transform: scale(1.05);
+}
+
+/* === LISTAS === */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0;
+  flex-grow: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+ul li {
+  background: #ffe0b2;
+  border-radius: 6px;
+  padding: 0.5rem;
+  margin-bottom: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.15s ease;
+  will-change: transform;
+}
+
+ul li:hover {
+  background: #ffcc80;
+  transform: scale(1.03);
+  overflow: hidden;
+  max-width: 100%;
+}
+
+ul li.selected,
+.pregunta.selected,
+li.selected {
+  background-color: #e65100;
+  color: white;
+  font-weight: bold;
+  box-shadow: inset 0 0 0 2px #bf360c;
+  border-radius: 6px;
+  padding: 0.5rem;
+}
+
+/* === INPUTS === */
+input[type="text"],
+input[type="number"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 2px solid #ff9800;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  box-sizing: border-box;
+  font-size: 1rem;
+  background-color: #fff8f0;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus {
+  border-color: #ef6c00;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(239, 108, 0, 0.2);
+}
+
+/* === RESPUESTA EN LÍNEA === */
+.respuesta-linea {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.respuesta-linea label {
+  font-weight: bold;
+  width: 20px;
+  text-align: center;
+  color: #bf360c;
+}
+
+.respuesta-linea input[type="text"] {
+  flex: 1;
+}
+
+/* INPUTS EN LÍNEA */
+.div-en-linea {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.div-en-linea label {
+  min-width: 140px;
+  font-weight: bold;
+  color: #bf360c;
+}
+
+/* === EXTRAS Y PERSONALIZACIONES === */
+#linkEstudiantes {
+  display: block;
+  font-weight: bold;
+  color: #bf360c;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ffccbc;
+  border-radius: 4px;
+}
+
+.estado-servidor {
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: #5d4037;
+  text-align: center;
+}
+
+.estado-servidor span {
+  padding: 0 6px;
+  border-radius: 6px;
+}
+
+#estadoServidorTexto {
+  background-color: #d32f2f;
+  color: white;
+}
+
+#estadoConexionesTexto {
+  background-color: #ffb74d;
+  color: white;
+}
+
+@keyframes vibrar {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-3px);
+  }
+}
+
+.vibrar {
+  animation: vibrar 0.4s ease;
+}
+
+/* Bloqueo duro de secciones */
+.is-locked {
+  position: relative !important;
+}
+.lock-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 999;
+  background: transparent;
+  cursor: not-allowed;
+}
+
+/* Bloqueo sencillo de secciones durante un lanzamiento */
+.locked {
+  pointer-events: none; /* bloquea clics */
+  user-select: none; /* evita selección/edición accidental */
+  opacity: 0.6; /* feedback visual */
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

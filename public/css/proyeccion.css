@@ -1,0 +1,287 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-image: url("/images/fondo-proyeccion.jpeg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  font-family: "Segoe UI", sans-serif;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#pantallaProyeccion {
+  background-color: rgba(255, 255, 255, 0.85);
+  border-radius: 12px;
+  padding: 2rem 3rem;
+  text-align: center;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
+}
+
+/* Animación de entrada flotante */
+@keyframes entradaSuave {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -40%);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Animación de pulso continuo del contenedor */
+@keyframes pulso {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.03);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+/* Zoom sutil en el QR */
+@keyframes zoomQR {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.04);
+  }
+}
+
+/* Estilo general del contenedor de espera */
+.pantalla-espera {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background-color: rgba(255, 245, 230, 0.95);
+  padding: 2rem;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  animation: entradaSuave 1.2s ease-out forwards, pulso 4s ease-in-out infinite;
+  transform: translate(-50%, -50%);
+}
+
+/* Estilo del texto del link */
+#linkManual {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #e65100;
+  margin: 1rem 0 0.5rem;
+}
+
+/* Estilo del mensaje de espera */
+#mensajeEspera {
+  font-size: 1rem;
+  color: #6d4c41;
+  margin-top: 0.5rem;
+}
+
+/* Texto del link de conexión */
+#urlConexion {
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #ff6f00;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  margin-top: 1rem;
+  animation: brillarLink 2s infinite alternate;
+  word-break: break-word;
+}
+
+/* Efecto de brillo suave para el link */
+@keyframes brillarLink {
+  from {
+    text-shadow: 0 0 8px rgba(255, 111, 0, 0.4);
+  }
+  to {
+    text-shadow: 0 0 16px rgba(255, 111, 0, 0.8);
+  }
+}
+
+/* Texto de espera */
+.mensaje-espera {
+  font-size: 1.1rem;
+  color: #6d4c41;
+  margin-top: 0.8rem;
+  font-style: italic;
+  opacity: 0.8;
+  animation: fadeinTexto 3s ease-in-out infinite alternate;
+}
+
+/* Animación sutil para mensaje */
+@keyframes fadeinTexto {
+  from {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.respuestas-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.respuesta-boton {
+  background-color: #ffcc80;
+  padding: 1.2rem;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.respuesta-boton:hover {
+  transform: scale(1.05);
+  background-color: #ffa726;
+}
+
+.temporizador {
+  margin-top: 1rem;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #d84315;
+}
+
+.respuesta-tarjeta {
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  user-select: none;
+}
+
+/* Colores llamativos */
+.color-0 {
+  background-color: #4caf50;
+}
+.color-1 {
+  background-color: #f44336;
+}
+.color-2 {
+  background-color: #7d2097;
+}
+.color-3 {
+  background-color: #1273c3;
+}
+
+.pregunta-contenido {
+  max-width: 800px;
+  margin: auto;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 2rem;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+  color: white;
+  animation: fadeIn 0.8s ease-in;
+}
+
+.pregunta-contenido h1 {
+  font-size: 2rem;
+  margin-bottom: 1.5rem;
+  font-family: "Segoe UI", sans-serif;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+.respuestas-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.respuesta-tarjeta {
+  padding: 1.8rem;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s;
+  user-select: none;
+}
+
+/* Temporizador */
+.temporizador {
+  margin-top: 2rem;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #ffcc00;
+  text-shadow: 0 0 5px rgba(255, 204, 0, 0.7);
+}
+
+/* Fade-in animación */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.pantalla-juego {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: transparent; /* o puedes usar rgba si deseas un fondo */
+  padding: 2rem;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: none;
+  animation: none !important;
+}
+
+
+.final-wrap { text-align:center; padding:24px; }
+.final-titulo { font-size: 2.4rem; margin: 0 0 12px; }
+
+.final-loader { display:flex; flex-direction:column; align-items:center; gap:12px; padding:40px; }
+.final-loader .spinner {
+  width:64px; height:64px; border:6px solid rgba(255,255,255,0.25);
+  border-top-color: #fff; border-radius:50%; animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.podio {
+  display:flex; align-items:flex-end; justify-content:center; gap:24px; margin: 12px auto 24px;
+  max-width: 980px;
+}
+.podio .col { display:flex; flex-direction:column; align-items:center; width: 28%; }
+.podio .col .bloque {
+  width:100%; border-radius:16px 16px 0 0; padding:16px 12px; color:#111;
+  background: linear-gradient(180deg, #fff, #ddd);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.2);
+}
+.podio .col .pos { font-size:2rem; font-weight:700; }
+.podio .col .nombre { font-size:1.25rem; margin-top:4px; }
+.podio .col .pts { font-size:1rem; opacity:0.8; }
+
+.podio .primero .bloque { height: 220px; background: linear-gradient(180deg, #ffd700, #f1c40f); }
+.podio .segundo .bloque { height: 180px; background: linear-gradient(180deg, #e5e5e5, #cfcfcf); }
+.podio .tercero .bloque { height: 150px; background: linear-gradient(180deg, #d9a066, #c27a28); }
+
+.tabla-final { max-width: 640px; margin: 0 auto; text-align:left; }
+.tabla-final ol { list-style: decimal; padding: 0 18px; }
+.tabla-final li { display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed rgba(255,255,255,0.2); }
+.tabla-final .n { margin-right: 8px; }
+.tabla-final .p { opacity:0.8; }

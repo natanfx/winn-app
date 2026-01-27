@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>WINN - Estudiante</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-image: url("./images/fondo-proyeccion.jpeg");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            font-family: "Segoe UI", sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #pantalla-estudiante {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 2rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+            color: white;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        h1,
+        h2 {
+            color: white;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
+        }
+
+        #respuestaBtns {
+            display: grid;
+            grid-template-columns: column;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        #respuestaBtns button {
+            padding: 1.8rem;
+            border-radius: 12px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        #respuestaBtns button:hover {
+            transform: scale(1.05);
+        }
+
+        #formulario,
+        #bienvenida {
+            background-color: rgba(255, 245, 230, 0.95);
+            padding: 2rem;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            margin: auto;
+            animation: entradaSuave 1.2s ease-out forwards;
+        }
+
+        input,
+        button {
+            font-size: 1rem;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border: none;
+            width: 100%;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        @keyframes entradaSuave {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display: flex; align-items: center; justify-content: center; height: 100vh; gap: 2rem;">
+
+        <h1
+            style="writing-mode: vertical-rl; transform: rotate(180deg); color: white; text-shadow: 0 2px 5px rgba(0,0,0,0.4); line-height: 0; margin: 0;">
+
+            Conexión a WINN
+        </h1>
+
+        <div>
+            <p id="mensajeError" style="color: red;"></p>
+
+            <div id="formulario">
+                <input type="text" id="nombre" placeholder="Tu nombre" required><br><br>
+                <input type="text" id="boleta" placeholder="Tu boleta" required><br><br>
+                <button id="conectarBtn">Conectarme</button>
+            </div>
+
+            <div id="bienvenida" style="display: none;">
+                <h2>Hola, <span id="nombreUsuario"></span> 👋</h2>
+                <p>Espera a que el docente inicie el cuestionario.</p>
+            </div>
+
+            <div id="pantalla-estudiante" style="display: none;">
+                <h2 id="enunciadoPregunta"></h2>
+                <div id="respuestaBtns">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+
+        const conectarBtn = document.getElementById('conectarBtn');
+        const nombreInput = document.getElementById('nombre');
+        const boletaInput = document.getElementById('boleta');
+        const formulario = document.getElementById('formulario');
+        const bienvenida = document.getElementById('bienvenida');
+        const nombreUsuario = document.getElementById('nombreUsuario');
+        const mensajeError = document.getElementById('mensajeError');
+
+        let conexionesPermitidas = false;
+        let tiempoInicioPregunta = null;
+
+        conectarBtn.disabled = true;
+        mensajeError.textContent = 'El docente no está aceptando conexiones en este momento.';
+
+        // Escucha el cambio de estado desde el servidor
+        socket.on('estado-conexiones', (permitido) => {
+            conexionesPermitidas = permitido;
+
+            if (conexionesPermitidas) {
+                conectarBtn.disabled = false;
+                mensajeError.textContent = '';
+            } else {
+                conectarBtn.disabled = true;
+                mensajeError.textContent = 'El docente no está aceptando conexiones en este momento.';
+            }
+        });
+
+        // Solicitar el estado al cargar
+        socket.emit('solicitar-estado-conexiones');
+
+        conectarBtn.addEventListener('click', () => {
+            const nombre = nombreInput.value.trim();
+            const boleta = boletaInput.value.trim();
+
+            if (!nombre || !boleta) {
+                alert('Por favor, escribe tu nombre y boleta.');
+                return;
+            }
+
+            socket.emit('registro-estudiante', { nombre, boleta });
+
+            socket.on('rechazado', (mensaje) => {
+                mensajeError.textContent = mensaje;
+            });
+
+            formulario.style.display = 'none';
+            nombreUsuario.textContent = nombre;
+            bienvenida.style.display = 'block';
+        });
+
+        // 🔁 Cuando el docente inicie el juego
+        socket.on('juegoIniciado', async () => {
+            try {
+                const res = await fetch('/api/pregunta-actual');
+                const data = await res.json();
+
+                if (data.pregunta) {
+                    mostrarPreguntaEstudiante(data.pregunta);
+                } else {
+                    console.warn("⚠️ No hay pregunta válida.");
+                }
+            } catch (error) {
+                console.error("❌ Error al obtener la pregunta actual:", error);
+            }
+        });
+
+        function mostrarPreguntaEstudiante(pregunta) {
+            tiempoInicioPregunta = Date.now(); // 🕒 Marca de inicio
+
+            document.getElementById('bienvenida').style.display = 'none';
+
+            const pantalla = document.getElementById('pantalla-estudiante');
+            if (!document.getElementById('enunciadoPregunta') || !document.getElementById('respuestaBtns')) {
+                pantalla.innerHTML = `
+                <h2 id="enunciadoPregunta"></h2>
+                <div id="respuestaBtns"></div>
+                `;
+            }
+
+            const enunciado = document.getElementById('enunciadoPregunta');
+            const respuestasDiv = document.getElementById('respuestaBtns');
+
+            pantalla.style.display = 'block';
+
+            if (enunciado) {
+                enunciado.textContent = pregunta.enunciado;
+            } else {
+                console.warn("⚠️ No se encontró el elemento #enunciadoPregunta al intentar mostrar la pregunta.");
+            }
+
+            respuestasDiv.innerHTML = '';
+
+            pregunta.respuestas.forEach((r, idx) => {
+                const btn = document.createElement('button');
+                btn.textContent = r.respuesta;
+                btn.style.backgroundColor = ['#4caf50', '#f44336', '#7d2097', '#1273c3'][idx % 4];
+
+                btn.addEventListener('click', () => {
+                    // 🔒 Desactiva todos los botones
+                    const allBtns = document.querySelectorAll('#respuestaBtns button');
+                    allBtns.forEach(b => b.disabled = true);
+
+                    const tiempoTotalMs = pregunta.tiempo_limite * 1000;
+                    const tiempoTranscurridoMs = Date.now() - tiempoInicioPregunta;
+                    const tiempoRestanteMs = Math.max(0, tiempoTotalMs - tiempoTranscurridoMs);
+
+                    // 📤 Envía la respuesta al servidor
+                    socket.emit('respuesta-estudiante', {
+                        pregunta_id: pregunta.id,
+                        respuesta_id: r.id,
+                        tiempoRestanteMs,
+                        tiempoTotalMs
+                    });
+
+                    // ⏳ Muestra mensaje de espera
+                    respuestasDiv.innerHTML = `
+                        <p style="color: #fff; font-size: 1.2rem; margin-top: 1rem;">
+                            Respuesta enviada. Espera la siguiente pregunta...
+                        </p>`;
+                });
+
+                respuestasDiv.appendChild(btn);
+            });
+        }
+
+        socket.on('nuevaPregunta', (pregunta) => {
+            mostrarPreguntaEstudiante(pregunta);
+        });
+
+        socket.on('juegoFinalizado', () => {
+            document.getElementById('pantalla-estudiante').innerHTML = `
+                <h2 style="color:white;">🎉 Juego finalizado</h2>
+                <p>Gracias por participar.</p>
+            `;
+        });
+
+        socket.on('mostrar-ranking', () => {
+            const pantalla = document.getElementById('pantalla-estudiante');
+            let enunciado = document.getElementById('enunciadoPregunta');
+            let respuestasDiv = document.getElementById('respuestaBtns');
+
+            // Si por alguna razón no existen (primera vez), reconstruye la plantilla base
+            if (!enunciado || !respuestasDiv) {
+                pantalla.innerHTML = `
+                    <h2 id="enunciadoPregunta"></h2>
+                    <div id="respuestaBtns"></div>
+                    `;
+                enunciado = document.getElementById('enunciadoPregunta');
+                respuestasDiv = document.getElementById('respuestaBtns');
+            }
+
+            enunciado.textContent = '🏁 Tiempo finalizado';
+            respuestasDiv.innerHTML = `
+                    <p style="color:white; font-size:1.2rem;">⏳ Espera la siguiente pregunta...</p>
+                `;
+        });
+
+        socket.on('juegoFinalizado', ({ ranking }) => {
+            const pantalla = document.getElementById('pantalla-estudiante');
+            if (pantalla) {
+                pantalla.innerHTML = `
+                <div style="text-align:center;padding:24px;">
+                    <h2>Cuestionario terminado</h2>
+                    <p>Calculando resultados finales…</p>
+                </div>
+                `;
+                setTimeout(() => {
+                    // versión simple: solo top 5
+                    const top5 = ranking.slice(0, 5).map((r, i) => `<li>${i + 1}. ${r.nombre} — ${r.puntaje} pts</li>`).join('');
+                    pantalla.innerHTML = `
+                    <div style="text-align:center;padding:24px;">
+                    <h2>Resultados</h2>
+                    <ol style="text-align:left;max-width:480px;margin:12px auto 0;">
+                        ${top5}
+                    </ol>
+                    <p style="opacity:.7;margin-top:12px;">Revisa la pantalla principal para ver el podio</p>
+                    </div>
+                `;
+                }, 5000);
+            }
+        });
+    </script>
+</body>
+
+</html>

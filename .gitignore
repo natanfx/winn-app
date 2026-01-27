@@ -1,0 +1,17 @@
+# dependencias
+node_modules/
+
+# builds / empaquetados
+out/
+dist/
+build/
+release/
+
+# logs y sistema
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+
+# variables de entorno
+.env
