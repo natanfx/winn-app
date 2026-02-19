@@ -1,55 +1,52 @@
 // public/js/proyeccion.js
-// Vista de proyección (solo lectura):
-// - Se abre desde Electron (ventana secundaria)
-// - Se conecta a Socket.IO (servido por tu backend Express)
-// - Muestra QR/URL de conexión
-// - Muestra pregunta actual / pantallas de “ranking” / fin del juego
+// ============================================================
+// WINN - Proyección (solo lectura)
+// ------------------------------------------------------------
+// Responsabilidad:
+// - Mostrar QR + URL para que los estudiantes se conecten
+// - Escuchar eventos Socket.IO del backend:
+//   - juegoIniciado: el juego arrancó
+//   - nuevaPregunta: llega una pregunta para proyectar
+//   - mostrar-ranking: mostrar ranking intermedio
+//   - juegoFinalizado: mostrar resultados finales
 //
-// Nota importante:
-// - proyeccion.html se carga desde http://localhost:3000/proyeccion.html
-// - Por eso aquí SÍ funciona: const socket = io();
+// Nota:
+// - proyeccion.html carga Socket.IO con: /socket.io/socket.io.js
+// - proyeccion.html NO tiene #contenido; todo vive en #pantalla-espera
+//   por eso aquí renderizamos siempre dentro de #pantalla-espera.
+// ============================================================
 
 'use strict';
 
-// ------------------------------------------------------------
-// Socket.IO
-// ------------------------------------------------------------
+console.log('[proyeccion] ✅ Proyección abierta');
 
-// Socket.IO (proyeccion.html ya carga /socket.io/socket.io.js)
+// ============================================================
+// 1) Socket.IO
+// ============================================================
 const socket = io();
 
-// ------------------------------------------------------------
-// Cache de DOM (evita repetir document.getElementById muchas veces)
-// ------------------------------------------------------------
-
+// ============================================================
+// 2) Cache de DOM
+// ============================================================
 const DOM = {
-  qrConexion: null,
-  urlConexion: null,
-  contenido: null,
+  root: null,        // #pantalla-espera (contenedor principal)
+  qr: null,          // #qrConexion
+  url: null,         // #urlConexion
 };
 
-// ------------------------------------------------------------
-// Helpers DOM / UI
-// ------------------------------------------------------------
-
-/**
- * Inicializa el cache de referencias DOM.
- * Si algo no existe, lo reporta en consola (no rompe la app).
- */
 function cacheDom() {
-  DOM.qrConexion = document.getElementById('qrConexion');
-  DOM.urlConexion = document.getElementById('urlConexion');
-  DOM.contenido = document.getElementById('contenido');
+  DOM.root = document.getElementById('pantalla-espera');
+  DOM.qr = document.getElementById('qrConexion');
+  DOM.url = document.getElementById('urlConexion');
 
-  if (!DOM.qrConexion) console.warn('[proyeccion] Falta #qrConexion en el HTML');
-  if (!DOM.urlConexion) console.warn('[proyeccion] Falta #urlConexion en el HTML');
-  if (!DOM.contenido) console.warn('[proyeccion] Falta #contenido en el HTML');
+  if (!DOM.root) console.warn('[proyeccion] Falta #pantalla-espera en proyeccion.html');
+  if (!DOM.qr) console.warn('[proyeccion] Falta #qrConexion en proyeccion.html');
+  if (!DOM.url) console.warn('[proyeccion] Falta #urlConexion en proyeccion.html');
 }
 
-/**
- * Render del QR y URL de conexión.
- * Esta info viene desde Electron (preload -> IPC -> main).
- */
+// ============================================================
+// 3) Render: QR + URL (vía preload -> IPC -> main)
+// ============================================================
 async function renderDatosConexion() {
   if (!window.conexion?.obtenerDatos) {
     console.warn('[proyeccion] window.conexion.obtenerDatos() no está disponible (preload)');
@@ -58,114 +55,155 @@ async function renderDatosConexion() {
 
   try {
     const { qr, url } = await window.conexion.obtenerDatos();
-
-    if (DOM.qrConexion) DOM.qrConexion.src = qr;
-    if (DOM.urlConexion) DOM.urlConexion.textContent = url;
-  } catch (err) {
-    console.error('❌ Error obteniendo datos de conexión:', err);
+    if (DOM.qr) DOM.qr.src = qr;
+    if (DOM.url) DOM.url.textContent = url;
+  } catch (e) {
+    console.error('[proyeccion] ❌ No se pudieron obtener datos de conexión:', e);
   }
 }
 
-/**
- * Render de pantalla “pregunta”.
- * La proyección NO permite responder: solo muestra.
- */
-function renderPregunta(pregunta) {
-  if (!DOM.contenido) return;
+// ============================================================
+// 4) Helpers UI
+// ============================================================
+function setModoPantallaJuego() {
+  // Reutilizamos el mismo contenedor, solo cambiamos la clase para estilos
+  if (!DOM.root) return;
+
+  DOM.root.className = '';               // limpiamos clases previas
+  DOM.root.classList.add('pantalla-juego');
+}
+
+function mostrarPreguntaProyeccion(pregunta) {
+  if (!DOM.root) return;
+
+  setModoPantallaJuego();
 
   const enunciado = pregunta?.enunciado ?? '(Sin enunciado)';
   const respuestas = Array.isArray(pregunta?.respuestas) ? pregunta.respuestas : [];
+  const tiempo = pregunta?.tiempo_limite ?? 15;
 
-  DOM.contenido.innerHTML = `
-    <h1>${enunciado}</h1>
-    <div id="respuestas"></div>
+  DOM.root.innerHTML = `
+    <div class="pregunta-contenido">
+      <h1>${enunciado}</h1>
+
+      <div class="respuestas-grid">
+        ${respuestas
+          .map((r, i) => `<div class="respuesta-tarjeta color-${i}">${r?.respuesta ?? ''}</div>`)
+          .join('')}
+      </div>
+
+      <div id="temporizador" class="temporizador"></div>
+    </div>
   `;
 
-  const respuestasDiv = document.getElementById('respuestas');
-  if (!respuestasDiv) return;
-
-  // Colores usados para distinguir opciones visualmente (solo UI).
-  const colores = ['#4caf50', '#f44336', '#7d2097', '#1273c3'];
-
-  respuestas.forEach((r, i) => {
-    const btn = document.createElement('button');
-    btn.textContent = r?.respuesta ?? '(Sin texto)';
-    btn.style.backgroundColor = colores[i % colores.length];
-    btn.disabled = true;
-    respuestasDiv.appendChild(btn);
-  });
+  iniciarTemporizador(tiempo);
 }
 
-/**
- * Render de pantalla “tiempo finalizado / mostrando ranking”.
- */
-function renderMostrandoRanking() {
-  if (!DOM.contenido) return;
-  DOM.contenido.innerHTML = `<h1>⏱️ Tiempo finalizado</h1><h2>Mostrando ranking...</h2>`;
+function iniciarTemporizador(segundos) {
+  const timer = document.getElementById('temporizador');
+  let restante = Number(segundos) || 0;
+
+  // Si no hay timer (por CSS/HTML), no rompemos
+  if (!timer) return;
+
+  timer.textContent = `⏱️ ${restante}s`;
+
+  const intervalo = setInterval(() => {
+    restante--;
+    if (restante >= 0) timer.textContent = `⏱️ ${restante}s`;
+
+    if (restante < 0) {
+      clearInterval(intervalo);
+      timer.textContent = '🛑 Tiempo finalizado';
+      // Solo avisamos; el backend decide si muestra ranking
+      socket.emit('fin-pregunta');
+    }
+  }, 1000);
 }
 
-/**
- * Render de pantalla final del juego con ranking.
- */
-function renderJuegoFinalizado(ranking) {
-  if (!DOM.contenido) return;
+function renderRankingActual() {
+  if (!DOM.root) return;
 
-  const lista = Array.isArray(ranking) ? ranking : [];
-  const top = lista.slice(0, 10);
+  setModoPantallaJuego();
 
-  DOM.contenido.innerHTML = `
-    <h1>🏆 Juego finalizado</h1>
-    <ol>
-      ${top
-        .map((r) => `<li>${r?.nombre ?? '(Sin nombre)'} — ${r?.puntaje ?? 0}</li>`)
-        .join('')}
-    </ol>
+  DOM.root.innerHTML = `
+    <div class="pregunta-contenido">
+      <h1>🏆 Ranking actual</h1>
+      <div id="rankingLista">Cargando...</div>
+    </div>
+  `;
+
+  fetch('/api/ranking')
+    .then(res => res.json())
+    .then(data => {
+      const div = document.getElementById('rankingLista');
+      if (!div) return;
+
+      if (!Array.isArray(data) || data.length === 0) {
+        div.textContent = 'Aún no hay resultados.';
+        return;
+      }
+
+      div.innerHTML = data
+        .map((e, i) => `<p>${i + 1}. ${e.nombre} - ${e.puntaje} pts</p>`)
+        .join('');
+    })
+    .catch(err => console.error('[proyeccion] ❌ Error cargando ranking:', err));
+}
+
+function renderFinal(ranking) {
+  if (!DOM.root) return;
+
+  setModoPantallaJuego();
+
+  const top = Array.isArray(ranking) ? ranking : [];
+  DOM.root.innerHTML = `
+    <div class="pregunta-contenido">
+      <h1>🏁 Juego finalizado</h1>
+      <ol>
+        ${top.map(r => `<li>${r.nombre} — ${r.puntaje} pts</li>`).join('')}
+      </ol>
+    </div>
   `;
 }
 
-// ------------------------------------------------------------
-// Ciclo de vida del documento
-// ------------------------------------------------------------
+// ============================================================
+// 5) Eventos Socket.IO
+// ============================================================
+socket.on('juegoIniciado', async () => {
+  console.log('[proyeccion] 🚀 juegoIniciado');
 
+  // Opcional: intentar pintar la pregunta actual si el backend la expone
+  // (así, aunque la proyección se abrió tarde, se sincroniza)
+  try {
+    const res = await fetch('/api/pregunta-actual');
+    const data = await res.json();
+    if (data?.pregunta) mostrarPreguntaProyeccion(data.pregunta);
+  } catch (e) {
+    // Si no existe el endpoint, no pasa nada
+    console.warn('[proyeccion] No se pudo obtener /api/pregunta-actual:', e?.message || e);
+  }
+});
+
+socket.on('nuevaPregunta', (pregunta) => {
+  console.log('[proyeccion] 📨 nuevaPregunta');
+  mostrarPreguntaProyeccion(pregunta);
+});
+
+socket.on('mostrar-ranking', () => {
+  console.log('[proyeccion] 🏆 mostrar-ranking');
+  renderRankingActual();
+});
+
+socket.on('juegoFinalizado', ({ ranking } = {}) => {
+  console.log('[proyeccion] ✅ juegoFinalizado');
+  renderFinal(ranking);
+});
+
+// ============================================================
+// 6) Boot
+// ============================================================
 window.addEventListener('DOMContentLoaded', async () => {
-  console.log('✅ Proyección abierta correctamente');
-
   cacheDom();
   await renderDatosConexion();
-});
-
-// ------------------------------------------------------------
-// Eventos del juego (Socket.IO)
-// ------------------------------------------------------------
-
-/**
- * El backend informa que se inició el juego.
- * (En proyección por ahora solo log; la pantalla cambia cuando llega “nuevaPregunta”.)
- */
-socket.on('juegoIniciado', () => {
-  console.log('🚀 Juego iniciado');
-});
-
-/**
- * Backend envía una nueva pregunta.
- */
-socket.on('nuevaPregunta', (pregunta) => {
-  console.log('📩 Nueva pregunta recibida:', pregunta);
-  renderPregunta(pregunta);
-});
-
-/**
- * Backend indica “mostrar ranking” (normalmente al finalizar el tiempo de una pregunta).
- */
-socket.on('mostrar-ranking', () => {
-  console.log('🏁 Mostrar ranking');
-  renderMostrandoRanking();
-});
-
-/**
- * Backend indica fin del juego y envía ranking final.
- */
-socket.on('juegoFinalizado', ({ ranking }) => {
-  console.log('🏆 Juego finalizado. Ranking:', ranking);
-  renderJuegoFinalizado(ranking);
 });

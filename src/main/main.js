@@ -14,7 +14,7 @@ const os = require('os');
  * Estado global de ventanas
  */
 let proyeccionWindow = null;
-
+let permitirCerrarProyeccion = false;
 /**
  * Bandera de desarrollo
  */
@@ -80,8 +80,10 @@ function startBackend() {
  */
 function createMainWindow() {
   const win = new BrowserWindow({
-    width: 1280,
-    height: 1000,
+    width: 1400,
+    height: 850,
+    show: false,
+    resizable: false,
     x: 0,
     y: 0,
     icon: getAssetPath('assets', 'icons', 'icon.png'),
@@ -92,15 +94,13 @@ function createMainWindow() {
     },
   });
 
-  win.maximize();
+  win.loadFile(path.join(__dirname, '../../public/docente.html'));
 
-  // opcional: mostrar cuando ya esté lista
   win.once('ready-to-show', () => {
     win.show();
   });
-
-  win.loadFile(path.join(__dirname, '../../public/docente.html'));
 }
+
 
 /**
  * Abre (o enfoca) la ventana de proyección.
@@ -132,8 +132,11 @@ function openProyeccionWindow() {
     y,
     width: secundaria.bounds.width,
     height: secundaria.bounds.height,
-    show: false, // evita parpadeo
-    fullscreenable: true,
+    show: false,
+    fullscreenable: false,
+    autoHideMenuBar: true,
+    frame: false, // 🔥 elimina barra con cerrar/minimizar
+    resizable: false,
     icon: getAssetPath('assets', 'icons', 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -141,6 +144,13 @@ function openProyeccionWindow() {
       contextIsolation: true,
     },
   });
+
+  proyeccionWindow.on('close', (e) => {
+    if (!permitirCerrarProyeccion) {
+      e.preventDefault();
+      proyeccionWindow.focus();
+    }
+  })
 
   // Maximizar en la pantalla donde cayó
   proyeccionWindow.maximize();
@@ -163,9 +173,11 @@ function openProyeccionWindow() {
  */
 function closeProyeccionWindow() {
   if (proyeccionWindow && !proyeccionWindow.isDestroyed()) {
+    permitirCerrarProyeccion = true;
     proyeccionWindow.close();
   }
   proyeccionWindow = null;
+  permitirCerrarProyeccion = false;
 }
 
 // ------------------------------------------------------------

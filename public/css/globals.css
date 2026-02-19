@@ -90,7 +90,9 @@ h2 {
   color: white;
   border: none;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .card#controles .botones-controles button:hover {
@@ -115,7 +117,9 @@ h2 {
   background: #ef6c00;
   color: white;
   cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -143,7 +147,9 @@ ul li {
   padding: 0.5rem;
   margin-bottom: 4px;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.15s ease;
+  transition:
+    background 0.3s ease,
+    transform 0.15s ease;
   will-change: transform;
 }
 
@@ -176,7 +182,9 @@ input[type="number"] {
   box-sizing: border-box;
   font-size: 1rem;
   background-color: #fff8f0;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition:
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 input[type="text"]:focus,
@@ -220,13 +228,6 @@ input[type="number"]:focus {
 }
 
 /* === EXTRAS Y PERSONALIZACIONES === */
-#linkEstudiantes {
-  display: block;
-  font-weight: bold;
-  color: #bf360c;
-  margin-bottom: 0.5rem;
-  font-size: 0.9rem;
-}
 
 ::-webkit-scrollbar {
   width: 8px;
@@ -302,4 +303,89 @@ input[type="number"]:focus {
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+/* ==========================
+   FIX: Estudiantes y Lanzamientos (orden de arriba hacia abajo)
+   ========================== */
+
+/* Mantén tu .card general con space-between (sirve para paneles con botones abajo)
+   pero estos dos paneles deben fluir normal */
+.card#estudiantes,
+.card#lanzamientos {
+  justify-content: flex-start;
+}
+
+/* Estudiantes: la URL arriba ya está en el HTML, aquí solo la hacemos visible y coherente */
+#estudiantes .divider {
+  height: 1px;
+  width: 100%;
+  background: rgba(255, 204, 128, 0.9);
+  margin: 10px 0 12px 0;
+}
+
+#estudiantes .url-conexion {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff8f0;
+  border: 2px solid #ffcc80;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+#estudiantes .controls.estudiantes-controls {
+  margin-top: 0; /* anula el "auto" */
+  display: flex;
+  flex-direction: column; /* lista arriba, botón abajo */
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 10px;
+}
+
+/* Lista estudiantes: siempre desde arriba */
+#listaEstudiantes {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  /* importante: no depende del ul global */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 8px;
+
+  /* para que se vea bien si hay muchos */
+  max-height: 260px;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* Botón refrescar abajo y alineado a la derecha */
+#estudiantes #refrescarEstudiantes {
+  width: auto;
+  align-self: flex-end;
+}
+
+/* ===============================
+   Fila dividida: Link de conexión
+   =============================== */
+
+/* Columna izquierda */
+#estudiantes .url-label {
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: #bf360c;
+  text-align:center;
+}
+
+/* Columna derecha */
+#estudiantes .url-value {
+  text-align: center;
+}
+
+#linkEstudiantes{
+  display: inline-block;
+  font-weight: 900;
+  font-size: 1.35rem;
+  color: #bf360c;
+  word-break: break-word;
 }

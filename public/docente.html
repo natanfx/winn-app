@@ -14,7 +14,6 @@
         <!-- Bloque 1: Cuestionarios -->
         <div class="card" id="cuestionarios">
             <h2>📋 Cuestionarios</h2>
-            <ul id="listaCuestionarios"></ul>
 
             <div class="div-en-linea">
                 <label>Cuestionario</label>
@@ -25,6 +24,8 @@
                 <label>Segundos:</label>
                 <input type="number" id="nuevoTiempo" placeholder="Segundos por pregunta">
             </div>
+
+            <ul id="listaCuestionarios"></ul>
 
             <div class="controls">
                 <button id="agregarCuestionario">➕</button>
@@ -38,9 +39,10 @@
         <!-- Bloque 2: Preguntas -->
         <div class="card" id="preguntas">
             <h2>❓ Preguntas</h2>
-            <ul id="listaPreguntas"></ul>
 
             <input type="text" id="nuevoTextoPregunta" placeholder="Texto de la Pregunta">
+            
+            <ul id="listaPreguntas"></ul>
 
             <div class="controls">
                 <button id="agregarPregunta">➕</button>
@@ -105,11 +107,18 @@
         <!-- Bloque 5: Estudiantes Conectados -->
         <div class="card" id="estudiantes">
             <h2>👥 Estudiantes Conectados</h2>
+            <div class="divider"></div>
+
+            <div class="url-conexion">
+                <div class="url-label">Link de conexión</div>
+                <div class="url-value">
+                    <label id="linkEstudiantes"></label>
+                </div>
+            </div>
 
             <div class="controls">
-                <label id="linkEstudiantes"></label>
                 <ul id="listaEstudiantes"></ul>
-                <button id="refrescarEstudiantes">🔄</button>
+                <button id="refrescarEstudiantes">🔄 Actualizar lista</button>
             </div>
         </div>
 

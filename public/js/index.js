@@ -229,9 +229,19 @@ function inicializarProyeccion() {
   if (DOM.btnCerrarProyeccion) {
     DOM.btnCerrarProyeccion.addEventListener('click', async () => {
       try {
-        await window.electronAPI.cerrarProyeccion();
-        UI.proyeccionAbierta = false;
-        aplicarEstadoBotones();
+
+        const ok = window.confirm(
+          '⚠️ No se puede cerrar la ventana a medio juego.\n\n' +
+          'Toda la información de este lanzamiento se perderá y tendrás que iniciar un nuevo juego.\n\n' +
+          '¿Deseas cerrar la proyección?'
+        );
+
+        if (ok) {
+          await window.electronAPI.cerrarProyeccion();
+
+          UI.proyeccionAbierta = false;
+          aplicarEstadoBotones();
+        }
       } catch (e) {
         console.error('No se pudo cerrar proyección', e);
       }
@@ -1030,10 +1040,7 @@ function renderLanzamientos(items) {
 
   items.forEach((it) => {
     const li = document.createElement('li');
-    li.style.cursor = 'pointer';
-    li.style.padding = '6px 8px';
-    li.style.border = '1px solid rgba(255,255,255,.15)';
-    li.style.borderRadius = '6px';
+
     li.innerHTML = `
       <strong>#${it.aplicacion_id}</strong>
       — <span>${it.titulo || '(sin título)'}</span>

@@ -11,7 +11,7 @@
             padding: 0;
             background-image: url("./images/fondo-proyeccion.jpeg");
             background-size: cover;
-            background-position: center;
+            background-position: left center;
             background-repeat: no-repeat;
             font-family: "Segoe UI", sans-serif;
             height: 100vh;
@@ -103,17 +103,63 @@
                 transform: translateY(0);
             }
         }
+
+        #titulo-winn {
+            display: inline-block;
+            text-align: center;
+            margin: 0 auto 1rem;
+            padding: 0.8rem 1.2rem;
+
+            color: #111;
+            font-size: 2rem;
+            font-weight: 800;
+            line-height: 1.1;
+
+            /* “marco” para separar del fondo */
+            background: rgba(255, 245, 230, 0.92);
+            border: 2px solid rgba(255, 183, 77, 0.9);
+            border-radius: 16px;
+
+            /* legibilidad */
+            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.28);
+            text-shadow: none;
+
+            /* si el navegador lo soporta, se ve pro */
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
+        }
+
+        /* Para asegurar que el título quede centrado aunque el contenedor no sea flex */
+        #titulo-winn {
+            max-width: 92vw;
+        }
+
+        #contenedor-estudiante {
+            width: 100%;
+            max-width: 520px;
+            /* ajusta si quieres más ancho */
+            margin: 0 auto;
+            padding: 0 1rem;
+            box-sizing: border-box;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* centra el h1 y el bloque de formulario */
+        }
+
+
+        #contenedor-estudiante>div {
+            width: 100%;
+            /* hace que formulario/bienvenida/pantalla ocupen el ancho del contenedor */
+        }
     </style>
 </head>
 
 <body>
-    <div style="display: flex; align-items: center; justify-content: center; height: 100vh; gap: 2rem;">
+    <div id="contenedor-estudiante">
 
-        <h1
-            style="writing-mode: vertical-rl; transform: rotate(180deg); color: white; text-shadow: 0 2px 5px rgba(0,0,0,0.4); line-height: 0; margin: 0;">
-
-            Conexión a WINN
-        </h1>
+        <h1 id="titulo-winn">Conexión a WINN</h1>
 
         <div>
             <p id="mensajeError" style="color: red;"></p>
@@ -151,6 +197,20 @@
 
         let conexionesPermitidas = false;
         let tiempoInicioPregunta = null;
+        let estadoPantalla = 'inicio'; // inicio | pregunta | ranking | final
+        let intervaloTemporizador = null; // si usas setInterval para algo
+
+        function limpiarTimers() {
+            if (intervaloTemporizador) {
+                clearInterval(intervaloTemporizador);
+                intervaloTemporizador = null;
+            }
+        }
+
+        function volverAInicio() {
+            // lo más seguro para regresar a “cero” sin estados raros:
+            window.location.reload();
+        }
 
         conectarBtn.disabled = true;
         mensajeError.textContent = 'El docente no está aceptando conexiones en este momento.';
@@ -193,6 +253,9 @@
 
         // 🔁 Cuando el docente inicie el juego
         socket.on('juegoIniciado', async () => {
+            if (estadoPantalla === 'final') return; // por si acaso
+            estadoPantalla = 'pregunta';
+
             try {
                 const res = await fetch('/api/pregunta-actual');
                 const data = await res.json();
@@ -267,17 +330,19 @@
         }
 
         socket.on('nuevaPregunta', (pregunta) => {
+            if (estadoPantalla === 'final') return;
+
+            limpiarTimers();
+            estadoPantalla = 'pregunta';
             mostrarPreguntaEstudiante(pregunta);
         });
 
-        socket.on('juegoFinalizado', () => {
-            document.getElementById('pantalla-estudiante').innerHTML = `
-                <h2 style="color:white;">🎉 Juego finalizado</h2>
-                <p>Gracias por participar.</p>
-            `;
-        });
-
         socket.on('mostrar-ranking', () => {
+            if (estadoPantalla === 'final') return;
+
+            limpiarTimers();
+            estadoPantalla = 'ranking';
+
             const pantalla = document.getElementById('pantalla-estudiante');
             let enunciado = document.getElementById('enunciadoPregunta');
             let respuestasDiv = document.getElementById('respuestaBtns');
@@ -298,30 +363,50 @@
                 `;
         });
 
-        socket.on('juegoFinalizado', ({ ranking }) => {
+        socket.on('juegoFinalizado', ({ ranking } = {}) => {
+            limpiarTimers();
+            estadoPantalla = 'final';
+
             const pantalla = document.getElementById('pantalla-estudiante');
-            if (pantalla) {
+            if (!pantalla) return;
+
+            // Si el servidor manda ranking, puedes mostrar un top rápido
+            if (Array.isArray(ranking) && ranking.length) {
+                const top5 = ranking
+                    .slice(0, 5)
+                    .map((r, i) => `<li>${i + 1}. ${r.nombre} — ${r.puntaje} pts</li>`)
+                    .join('');
+
                 pantalla.innerHTML = `
-                <div style="text-align:center;padding:24px;">
-                    <h2>Cuestionario terminado</h2>
-                    <p>Calculando resultados finales…</p>
-                </div>
-                `;
-                setTimeout(() => {
-                    // versión simple: solo top 5
-                    const top5 = ranking.slice(0, 5).map((r, i) => `<li>${i + 1}. ${r.nombre} — ${r.puntaje} pts</li>`).join('');
-                    pantalla.innerHTML = `
                     <div style="text-align:center;padding:24px;">
-                    <h2>Resultados</h2>
-                    <ol style="text-align:left;max-width:480px;margin:12px auto 0;">
+                        <h2 style="color:white;">🎉 Juego finalizado</h2>
+                        <ol style="text-align:left;max-width:480px;margin:12px auto 0;color:white;">
                         ${top5}
-                    </ol>
-                    <p style="opacity:.7;margin-top:12px;">Revisa la pantalla principal para ver el podio</p>
+                        </ol>
+
+                        <button id="btnVolverInicio" style="padding:12px 18px; font-size:18px; margin-top:16px;">
+                        Volver al inicio
+                        </button>
+                        <p style="opacity:.75;margin-top:12px;color:white;">Reiniciando automáticamente…</p>
                     </div>
+                    `;
+            } else {
+                // Si no hay ranking, solo mensaje final + volver al inicio
+                pantalla.innerHTML = `
+                <h2 style="color:white;">🎉 Juego finalizado</h2>
+                <p style="color:white;">Gracias por participar.</p>
+                <button id="btnVolverInicio" style="padding:12px 18px; font-size:18px; margin-top:16px;">
+                    Volver al inicio
+                </button>
+                <p style="opacity:.75;margin-top:12px;color:white;">Reiniciando automáticamente…</p>
                 `;
-                }, 5000);
             }
+
+            document.getElementById('btnVolverInicio')?.addEventListener('click', volverAInicio);
+            setTimeout(volverAInicio, 8000);
         });
+
+
     </script>
 </body>
 

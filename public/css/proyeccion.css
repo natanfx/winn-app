@@ -58,16 +58,36 @@ body {
 
 /* Estilo general del contenedor de espera */
 .pantalla-espera {
+  width: 85%;
+  height: 50%;
   position: absolute;
   top: 50%;
   left: 50%;
   background-color: rgba(255, 245, 230, 0.95);
-  padding: 2rem;
-  border-radius: 20px;
+
+  /* ANTES: padding: 2rem; */
+  padding: 3.5rem 4.5rem;
+
+  border-radius: 24px;
   text-align: center;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 28px rgba(0, 0, 0, 0.25);
+
+  /* Hace que el bloque se vea “grande” en proyector */
+  width: min(900px, 90vw);
+
   animation: entradaSuave 1.2s ease-out forwards, pulso 4s ease-in-out infinite;
   transform: translate(-50%, -50%);
+}
+
+/* QR grande para proyección */
+#qrConexion {
+  width: 520px;
+  height: 520px;
+  max-width: 70vw;
+  max-height: 70vw;
+  margin: 0 auto 1.2rem;
+  display: block;
+  animation: zoomQR 2.5s ease-in-out infinite;
 }
 
 /* Estilo del texto del link */
@@ -129,7 +149,7 @@ body {
 .respuestas-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 1.5rem;
   margin-top: 1rem;
 }
 
@@ -159,10 +179,11 @@ body {
   padding: 1.5rem;
   border-radius: 12px;
   text-align: center;
-  font-size: 1.4rem;
+  font-size: 4rem;
   font-weight: bold;
   color: white;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
   user-select: none;
 }
 
@@ -199,24 +220,6 @@ body {
   text-shadow: 0 2px 5px rgba(0, 0, 0, 0.4);
 }
 
-.respuestas-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-.respuesta-tarjeta {
-  padding: 1.8rem;
-  border-radius: 12px;
-  text-align: center;
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: white;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-  transition: transform 0.2s;
-  user-select: none;
-}
-
 /* Temporizador */
 .temporizador {
   margin-top: 2rem;
@@ -239,6 +242,8 @@ body {
 }
 
 .pantalla-juego {
+    width: 70%;
+
   position: absolute;
   top: 50%;
   left: 50%;
@@ -249,6 +254,28 @@ body {
   text-align: center;
   box-shadow: none;
   animation: none !important;
+}
+
+#rankingLista {
+  margin-top: 3rem;
+}
+
+#rankingLista p {
+  font-size: 2.4rem;
+  margin: 0.8rem 0;
+}
+
+#rankingLista p:nth-child(1) {
+  font-size: 3.5rem;
+  font-weight: bold;
+}
+
+#rankingLista p:nth-child(2) {
+  font-size: 3rem;
+}
+
+#rankingLista p:nth-child(3) {
+  font-size: 2.7rem;
 }
 
 
