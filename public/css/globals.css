@@ -1,12 +1,17 @@
 /* === RESET Y BASE === */
-body {
+html, body {
   font-family: "Segoe UI", sans-serif;
   margin: 0;
   padding: 0;
   background: #fef6f0;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
+}
+
+body {
+  overflow: hidden;
+  scrollbar-gutter: stable;
 }
 
 /* === TIPOGRAFÍA === */
@@ -14,6 +19,7 @@ h1 {
   text-align: center;
   margin: 1rem 0 0.5rem;
   color: #4e342e;
+  flex: 0 0 auto;
 }
 
 h2 {
@@ -36,7 +42,7 @@ h2 {
 .container-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: 60% 40%;
+  grid-template-rows: 50% 50%;
   gap: 1rem;
   padding: 1rem;
   flex-grow: 1;
@@ -57,6 +63,8 @@ h2 {
   min-height: 100px;
   transition: none;
   overflow: hidden;
+  height: 95%;
+  min-height: 0;         /* clave en CSS Grid + flex */
 }
 
 .card#controles {
@@ -64,7 +72,6 @@ h2 {
   flex-direction: column;
   justify-content: stretch;
   flex-grow: 1;
-  height: 100%;
 }
 
 .card#controles .botones-controles {
@@ -316,23 +323,17 @@ button:disabled {
   justify-content: flex-start;
 }
 
-/* Estudiantes: la URL arriba ya está en el HTML, aquí solo la hacemos visible y coherente */
-#estudiantes .divider {
-  height: 1px;
-  width: 100%;
-  background: rgba(255, 204, 128, 0.9);
-  margin: 10px 0 12px 0;
-}
-
 #estudiantes .url-conexion {
-  padding: 10px 12px;
+  padding: 5px 5px;
   border-radius: 10px;
   background: #fff8f0;
   border: 2px solid #ffcc80;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 #estudiantes .controls.estudiantes-controls {
+  flex: 1 1 auto;
+  min-height: 0;
+  flex-wrap: nowrap;
   margin-top: 0; /* anula el "auto" */
   display: flex;
   flex-direction: column; /* lista arriba, botón abajo */
@@ -343,6 +344,9 @@ button:disabled {
 
 /* Lista estudiantes: siempre desde arriba */
 #listaEstudiantes {
+  flex: 1 1 auto;
+  min-height: 0;        /* CLAVE */
+  max-height: none;     /* quita el límite de 260px */
   margin: 0;
   padding: 0;
   list-style: none;
@@ -354,7 +358,6 @@ button:disabled {
   gap: 8px;
 
   /* para que se vea bien si hay muchos */
-  max-height: 260px;
   overflow-y: auto;
   overflow-x: hidden;
 }

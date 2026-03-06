@@ -235,3 +235,23 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
+
+ipcMain.handle('cerrar-winn', async () => {
+  try {
+    closeProyeccionWindow();
+  } catch (e) {
+    console.error('[main] Error cerrando proyección al salir:', e);
+  }
+
+  // Cerrar ventanas rápido
+  try {
+    BrowserWindow.getAllWindows().forEach((w) => {
+      if (!w.isDestroyed()) w.destroy();
+    });
+  } catch {}
+
+  // Salir
+  setTimeout(() => app.exit(0), 150);
+  app.quit();
+  return true;
+});

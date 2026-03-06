@@ -19,6 +19,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('electronAPI', {
   abrirProyeccion: () => ipcRenderer.invoke('abrir-proyeccion'),
   cerrarProyeccion: () => ipcRenderer.invoke('cerrar-proyeccion'),
+  cerrarWinn: () => ipcRenderer.invoke('cerrar-winn'),
 });
 
 /**

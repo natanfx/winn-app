@@ -212,7 +212,8 @@ async function flushIntentoActual() {
       estudiante_id: mapIds[r.boleta],
       pregunta_id: r.pregunta_id,
       respuesta_id: r.respuesta_id,
-      tiempo_ms: r.tiempo_s // nombre del arg, pero son segundos (ok para schema)
+      tiempo_respuesta: r.tiempo_respuesta,
+      puntaje: r.puntaje
     }))
   );
 
@@ -321,29 +322,32 @@ io.on('connection', (socket) => {
   /**
    * Respuesta del estudiante (socket)
    */
-  socket.on('respuesta-estudiante', ({ pregunta_id, respuesta_id, tiempoRestanteMs, tiempoTotalMs }) => {
+  socket.on('respuesta-estudiante', ({ pregunta_id, respuesta_id, tiempoRestanteMs, tiempoLimiteMs, tiempoTranscurridoMs }) => {
     const estudiante = estudiantesConectados.find(e => e.socketId === socket.id);
     const pregunta = preguntasEnJuego.find(p => p.id === pregunta_id);
     if (!estudiante || !pregunta) return;
+
+    //           tiempoRestanteMs, // milisegundos vivos anes de que temine la pregunta
+    //           tiempoLimiteMs, //milisegundos configurados por el docente (pregunta.tiempo_limite * 1000)
+    //           tiempoTranscurridoMs //milisegundos muertos, los que el estudiante tardoo en contestar
 
     // Determinar si es correcta según el banco en RAM
     const respuesta = pregunta.respuestas.find(r => r.id === respuesta_id);
     const esCorrecta = respuesta?.es_correcta === 1;
 
     // Puntaje: suma de milisegundos restantes (tu regla)
-    const puntos = esCorrecta ? Math.max(0, Math.floor(tiempoRestanteMs || 0)) : 0;
+    const puntaje = esCorrecta ? Math.floor(tiempoRestanteMs) : 0;
 
     // Ranking en vivo
-    estudiante.puntaje += puntos;
+    estudiante.puntaje += puntaje;
 
-    // Guardar respuesta para persistir al final (schema guarda segundos enteros)
-    const tiempoUsadoMs = Math.max(0, (tiempoTotalMs || 0) - (tiempoRestanteMs || 0));
     respuestasSesion.push({
       boleta: estudiante.boleta,
       nombre: estudiante.nombre,
       pregunta_id,
       respuesta_id,
-      tiempo_s: Math.round(tiempoUsadoMs / 1000)
+      tiempo_respuesta: Math.max(0, Math.floor(tiempoTranscurridoMs || 0)), // ms usados
+      puntaje
     });
 
     // Bitácora en memoria (evitar duplicados por boleta+pregunta)
@@ -354,17 +358,17 @@ io.on('connection', (socket) => {
         const mapaResp = intentoActual.respuestasPorEstudiante.get(boleta) || new Map();
         if (mapaResp.has(pregunta_id)) return; // ya respondió esta pregunta
 
-        mapaResp.set(pregunta_id, { respuestaId: respuesta_id, correcta: !!esCorrecta, ms: puntos });
+        mapaResp.set(pregunta_id, { respuestaId: respuesta_id, correcta: !!esCorrecta, ms: puntaje });
         intentoActual.respuestasPorEstudiante.set(boleta, mapaResp);
 
         const previo = intentoActual.puntajes.get(boleta) || 0;
-        intentoActual.puntajes.set(boleta, previo + puntos);
+        intentoActual.puntajes.set(boleta, previo + puntaje);
       }
     }
 
     console.log(
       `🎯 ${estudiante.nombre} respondió ${esCorrecta ? '✔️ bien' : '❌ mal'} ` +
-      `y ganó ${puntos} ms (Total: ${estudiante.puntaje})`
+      `y ganó ${puntaje} ms (Total: ${estudiante.puntaje})`
     );
   });
 });

@@ -118,7 +118,6 @@ function aplicarEstadoBotones() {
   if (DOM.btnIniciarLanzamiento) DOM.btnIniciarLanzamiento.disabled = enJuego;
   if (DOM.btnToggleConexiones) DOM.btnToggleConexiones.disabled = enJuego;
   if (DOM.btnSiguientePregunta) DOM.btnSiguientePregunta.disabled = !enJuego;
-  if (DOM.btnTerminarLanzamiento) DOM.btnTerminarLanzamiento.disabled = !enJuego;
 
   if (DOM.btnAbrirProyeccion) DOM.btnAbrirProyeccion.disabled = projAbierta;
   if (DOM.btnCerrarProyeccion) DOM.btnCerrarProyeccion.disabled = !projAbierta;
@@ -143,7 +142,7 @@ function bloquearSecciones(on) {
     if (!c) return;
     c.querySelectorAll('input, textarea, select, button, [contenteditable="true"]').forEach((el) => {
       // no tocamos botones de proyección
-      if (el.id === 'btnAbrirProyeccion' || el.id === 'btnCerrarProyeccion') return;
+      if (el.id === 'btnAbrirProyeccion' || el.id === 'btnCerrarProyeccion' || el.id === 'btnTerminarLanzamiento') return;
 
       if ('disabled' in el) el.disabled = !!on;
       if (el.isContentEditable) el.contentEditable = on ? 'false' : 'true';
@@ -154,7 +153,6 @@ function bloquearSecciones(on) {
   // 3) controles de juego / conexiones
   if (DOM.btnIniciarLanzamiento) DOM.btnIniciarLanzamiento.disabled = !!on;
   if (DOM.btnSiguientePregunta) DOM.btnSiguientePregunta.disabled = !on;
-  if (DOM.btnTerminarLanzamiento) DOM.btnTerminarLanzamiento.disabled = !on;
   if (DOM.btnToggleConexiones) DOM.btnToggleConexiones.disabled = !!on;
 }
 
@@ -185,7 +183,7 @@ function inicializarConexionEstudiantes() {
     DOM.listaEstudiantes.innerHTML = '';
     estudiantes.forEach((est) => {
       const li = document.createElement('li');
-      li.textContent = `${est.nombre} (${est.boleta}) - ${est.puntaje} pts`;
+      li.textContent = `${est.nombre} (${est.boleta}) - ${est.puntaje}`;
       DOM.listaEstudiantes.appendChild(li);
     });
   });
@@ -206,6 +204,41 @@ function inicializarConexionEstudiantes() {
   // Al abrir la app, por seguridad dejamos conexiones deshabilitadas
   socket.on('connect', () => {
     socket.emit('deshabilitar-conexiones');
+  });
+}
+
+// ------------------------------------------------------------
+// Cerrar Aplicación
+// ------------------------------------------------------------
+
+if (DOM.btnTerminarLanzamiento) {
+  DOM.btnTerminarLanzamiento.addEventListener('click', async () => {
+    const r = await Swal.fire({
+      title: 'Cerrar WINN',
+      html: `
+        <div style="text-align:left; line-height:1.4">
+          <p>Vas a cerrar la aplicación.</p>
+          <p style="margin:0.5rem 0 0 0">
+            <strong>Importante:</strong> si existe algún lanzamiento ejecutándose, no se guardará ni un solo dato.
+          </p>
+        </div>
+      `,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Sí, cerrar',
+      cancelButtonText: 'Cancelar',
+      confirmButtonColor: '#d33'
+    });
+
+    if (!r.isConfirmed) return;
+
+    try {
+      await window.electronAPI.cerrarWinn();
+    } catch (e) {
+      console.error('No se pudo cerrar WINN:', e);
+      // fallback: al menos intenta cerrar la pestaña (no siempre aplica en Electron)
+      window.close();
+    }
   });
 }
 
@@ -612,7 +645,6 @@ function renderPreguntas() {
 
       if (DOM.inputTextoPregunta) DOM.inputTextoPregunta.value = p.enunciado;
 
-      // corrección: aquí debe ser estado de PREGUNTA, no de CUESTIONARIO
       actualizarEstadoBotonesPregunta(ACCIONES_CRUD_PREGUNTA.SELECCIONAR);
 
       // cargar respuestas de la pregunta seleccionada
@@ -731,6 +763,7 @@ function inicializarPreguntas() {
 // ------------------------------------------------------------
 
 function cargarRespuestas() {
+  limpiarRespuestasUI();
   if (!preguntaSeleccionada) return;
 
   fetch(`${API_BASE}/api/respuestas/${preguntaSeleccionada.id}`)
@@ -744,7 +777,10 @@ function cargarRespuestas() {
         if (radios[i]) radios[i].checked = r.es_correcta === 1;
       });
     })
-    .catch((err) => console.error('❌ Error al cargar respuestas:', err));
+    .catch((err) => {
+      console.error('❌ Error al cargar respuestas:', err);
+      limpiarRespuestasUI();
+    });
 }
 
 function inicializarRespuestas() {
@@ -958,7 +994,7 @@ function inicializarJuego() {
       }
 
       const contenidoHTML = ranking
-        .map((e, i) => `<p><strong>${i + 1}.</strong> ${e.nombre} - ${e.puntaje} pts</p>`)
+        .map((e, i) => `<p><strong>${i + 1}.</strong> ${e.nombre} - ${e.puntaje}</p>`)
         .join('');
 
       await Swal.fire({
@@ -1040,16 +1076,36 @@ function renderLanzamientos(items) {
 
   items.forEach((it) => {
     const li = document.createElement('li');
-
     li.innerHTML = `
-      <strong>#${it.aplicacion_id}</strong>
-      — <span>${it.titulo || '(sin título)'}</span>
-      <small style="opacity:.7"> (QID: ${it.cuestionario_id})</small>
+      <div style="font-weight:600;">
+        #${it.aplicacion_id} — ${it.titulo || '(sin título)'}
+      </div>
+      <div style="font-size:.8rem; color:#888; margin-top:2px;">
+        ${formatearFecha(it.fecha)}
+      </div>
     `;
 
-    li.addEventListener('click', () => verDetalleLanzamiento(it.aplicacion_id));
+    li.addEventListener('click', () => verDetalleLanzamiento(it));
     ul.appendChild(li);
   });
+}
+
+function formatearFecha(fechaDB) {
+  const fecha = new Date(fechaDB);
+
+  const dia = fecha.getDate();
+  const anio = fecha.getFullYear();
+  const horas = String(fecha.getHours()).padStart(2, '0');
+  const minutos = String(fecha.getMinutes()).padStart(2, '0');
+
+  const meses = [
+    'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+    'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+  ];
+
+  const mes = meses[fecha.getMonth()];
+
+  return `${dia} de ${mes} ${anio}, ${horas}:${minutos} horas`;
 }
 
 async function mostrarLanzamientosEnModal(items) {
@@ -1074,24 +1130,24 @@ async function mostrarLanzamientosEnModal(items) {
   if (value) verDetalleLanzamiento(value);
 }
 
-async function verDetalleLanzamiento(aplicacionId) {
+async function verDetalleLanzamiento(aplicacion) {
   try {
-    const resp = await fetch(`${API_BASE}/api/aplicaciones/${aplicacionId}/detalle`);
+    const resp = await fetch(`${API_BASE}/api/aplicaciones/${aplicacion.aplicacion_id}/detalle`);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     const ranking = await resp.json();
 
     const listaHTML = (ranking || [])
       .map(
         (r, i) =>
-          `<li><strong>${i + 1}.</strong> ${r.nombre || '(sin nombre)'} [${r.boleta}] — ${r.puntaje} pts</li>`
+          `<li>${r.nombre || '(sin nombre)'} [${r.boleta}] — ${r.puntaje}</li>`
       )
       .join('');
 
     await Swal.fire({
-      title: `Lanzamiento #${aplicacionId}`,
+      title: `Lanzamiento Anterior`,
       html: `
         <div style="text-align:left">
-          <p><strong>Ranking:</strong></p>
+          <p><strong>${aplicacion.titulo}  (${formatearFecha(aplicacion.fecha)})</strong></p>
           <ol style="margin-left:1rem">${listaHTML || '<li>Sin respuestas</li>'}</ol>
         </div>
       `,

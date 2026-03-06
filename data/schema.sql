@@ -47,7 +47,8 @@ CREATE TABLE IF NOT EXISTS respuestas_estudiantes (
     estudiante_id INTEGER NOT NULL,
     pregunta_id INTEGER NOT NULL,
     respuesta_id INTEGER NOT NULL,
-    tiempo_respuesta INTEGER NOT NULL,
+    tiempo_respuesta INTEGER NOT NULL DEFAULT 0,
+    puntaje INTEGER NOT NULL DEFAULT 0,
     FOREIGN KEY (aplicacion_id) REFERENCES aplicaciones(id) ON DELETE CASCADE,
     FOREIGN KEY (estudiante_id) REFERENCES estudiantes(id) ON DELETE CASCADE,
     FOREIGN KEY (pregunta_id) REFERENCES preguntas(id) ON DELETE CASCADE,
@@ -101,23 +102,3 @@ INSERT INTO respuestas (pregunta_id, respuesta, es_correcta) VALUES
 (13, 'Marte', 1), (13, 'Júpiter', 0), (13, 'Venus', 0), (13, 'Saturno', 0),
 (14, 'Hidrógeno', 1), (14, 'Oxígeno', 0), (14, 'Helio', 0), (14, 'Carbono', 0),
 (15, 'Telégrafo', 1), (15, 'Teléfono', 0), (15, 'Radio', 0), (15, 'Televisión', 0);
-
--- Insertar intentos de cuestionarios
-INSERT INTO aplicaciones (cuestionario_id) VALUES
-(1), (1), (2), (2), (3);
-
--- Insertar estudiantes
-INSERT INTO estudiantes (boleta, nickname) VALUES
-('20230001', 'Juan'),
-('20230002', 'María'),
-('20230003', 'Carlos'),
-('20230004', 'Ana'),
-('20230005', 'Luis');
-
--- Insertar respuestas de los estudiantes en aplicaciones
-INSERT INTO respuestas_estudiantes (aplicacion_id, estudiante_id, pregunta_id, respuesta_id, tiempo_respuesta) VALUES
-(1, 1, 1, 1, 3),
-(1, 2, 1, 2, 4),
-(1, 3, 2, 5, 5),
-(1, 4, 2, 6, 2),
-(1, 5, 3, 9, 6);

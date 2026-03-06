@@ -41,6 +41,7 @@ const DB_PATH = process.env.WINN_DB_PATH || DEFAULT_DB_PATH_DEV;
  * Asegura que exista el directorio donde vivirá la BD
  */
 const dbDir = path.dirname(DB_PATH);
+console.log('DB PATH =>', dbDir);
 if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
@@ -201,7 +202,7 @@ function deletePregunta(id, callback) {
  */
 
 function getRespuestas(pregunta_id, callback) {
-  db.all('SELECT * FROM respuestas WHERE pregunta_id = ?', [pregunta_id], callback);
+  db.all('SELECT * FROM respuestas WHERE pregunta_id = ? ORDER BY id ASC', [pregunta_id], callback);
 }
 
 /**
@@ -376,24 +377,35 @@ function dbUpsertEstudiantesMasivoAsync(lista) {
  * 3) Inserción masiva de respuestas
  * respuestas: [{ estudiante_id, pregunta_id, respuesta_id, tiempo_ms }]
  *
- * Nota: en tu flujo real, tiempo_ms a veces está siendo SEGUNDOS.
  * Se respeta el nombre para no romper llamadas existentes.
  */
 function dbInsertRespuestasMasivoAsync(aplicacion_id, respuestas) {
   return new Promise((resolve, reject) => {
+
+    console.log('------------------- respuestas =>', respuestas);
+    console.log('------------------- respuestas.length =>', respuestas.length);
+
     if (!respuestas || respuestas.length === 0) return resolve();
+
+
+
 
     db.serialize(() => {
       db.run('BEGIN');
 
       const stmt = db.prepare(`
-        INSERT INTO respuestas_estudiantes (aplicacion_id, estudiante_id, pregunta_id, respuesta_id, tiempo_respuesta)
-        VALUES (?, ?, ?, ?, ?)
+        INSERT INTO respuestas_estudiantes (aplicacion_id, estudiante_id, pregunta_id, respuesta_id, tiempo_respuesta, puntaje)
+        VALUES (?, ?, ?, ?, ?, ?)
       `);
 
       for (const r of respuestas) {
         stmt.run(
-          [aplicacion_id, r.estudiante_id, r.pregunta_id, r.respuesta_id, r.tiempo_ms],
+          [aplicacion_id,
+            r.estudiante_id,
+            r.pregunta_id,
+            r.respuesta_id,
+            r.tiempo_respuesta ?? 0,
+            r.puntaje ?? 0],
           (err) => {
             if (err) return rollback(err);
           }
@@ -464,7 +476,7 @@ function insertarRespuestaEstudiante(aplicacion_id, estudiante_id, pregunta_id, 
  */
 function getAplicacionesConTitulo(cb) {
   db.all(
-    `SELECT a.id AS aplicacion_id, a.cuestionario_id, c.titulo
+    `SELECT a.id AS aplicacion_id, a.cuestionario_id, c.titulo, a.fecha
      FROM aplicaciones a
      JOIN cuestionarios c ON c.id = a.cuestionario_id
      ORDER BY a.id DESC`,
@@ -481,17 +493,9 @@ function getAplicacionesConTitulo(cb) {
 function getDetalleAplicacion(aplicacion_id, cb) {
   const sql = `
     SELECT e.nickname AS nombre, e.boleta,
-           SUM(
-             CASE WHEN r.es_correcta = 1
-                  THEN CAST( ((c.tiempo_limite - re.tiempo_respuesta) * 1000.0 / c.tiempo_limite) AS INTEGER )
-                  ELSE 0
-             END
-           ) AS puntaje
+           SUM(re.puntaje) AS puntaje
     FROM respuestas_estudiantes re
     JOIN estudiantes e ON e.id = re.estudiante_id
-    JOIN respuestas r ON r.id = re.respuesta_id
-    JOIN preguntas p ON p.id = re.pregunta_id
-    JOIN cuestionarios c ON c.id = p.cuestionario_id
     WHERE re.aplicacion_id = ?
     GROUP BY e.id, e.nickname, e.boleta
     ORDER BY puntaje DESC;

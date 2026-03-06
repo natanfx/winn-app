@@ -302,23 +302,24 @@
                 btn.style.backgroundColor = ['#4caf50', '#f44336', '#7d2097', '#1273c3'][idx % 4];
 
                 btn.addEventListener('click', () => {
-                    // 🔒 Desactiva todos los botones
+                    // Desactiva todos los botones
                     const allBtns = document.querySelectorAll('#respuestaBtns button');
                     allBtns.forEach(b => b.disabled = true);
 
-                    const tiempoTotalMs = pregunta.tiempo_limite * 1000;
+                    const tiempoLimiteMs = pregunta.tiempo_limite * 1000;
                     const tiempoTranscurridoMs = Date.now() - tiempoInicioPregunta;
-                    const tiempoRestanteMs = Math.max(0, tiempoTotalMs - tiempoTranscurridoMs);
+                    const tiempoRestanteMs = Math.max(0, tiempoLimiteMs - tiempoTranscurridoMs);
 
-                    // 📤 Envía la respuesta al servidor
+                    // Envía la respuesta al servidor
                     socket.emit('respuesta-estudiante', {
                         pregunta_id: pregunta.id,
                         respuesta_id: r.id,
-                        tiempoRestanteMs,
-                        tiempoTotalMs
+                        tiempoRestanteMs, // milisegundos vivos anes de que temine la pregunta
+                        tiempoLimiteMs, //milisegundos configurados por el docente (pregunta.tiempo_limite * 1000)
+                        tiempoTranscurridoMs //milisegundos muertos, los que el estudiante tardoo en contestar
                     });
 
-                    // ⏳ Muestra mensaje de espera
+                    // Muestra mensaje de espera
                     respuestasDiv.innerHTML = `
                         <p style="color: #fff; font-size: 1.2rem; margin-top: 1rem;">
                             Respuesta enviada. Espera la siguiente pregunta...
@@ -374,7 +375,7 @@
             if (Array.isArray(ranking) && ranking.length) {
                 const top5 = ranking
                     .slice(0, 5)
-                    .map((r, i) => `<li>${i + 1}. ${r.nombre} — ${r.puntaje} pts</li>`)
+                    .map((r, i) => `<li>${i + 1}. ${r.nombre} — ${r.puntaje}</li>`)
                     .join('');
 
                 pantalla.innerHTML = `

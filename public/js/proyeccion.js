@@ -88,8 +88,8 @@ function mostrarPreguntaProyeccion(pregunta) {
 
       <div class="respuestas-grid">
         ${respuestas
-          .map((r, i) => `<div class="respuesta-tarjeta color-${i}">${r?.respuesta ?? ''}</div>`)
-          .join('')}
+      .map((r, i) => `<div class="respuesta-tarjeta color-${i}">${r?.respuesta ?? ''}</div>`)
+      .join('')}
       </div>
 
       <div id="temporizador" class="temporizador"></div>
@@ -145,7 +145,7 @@ function renderRankingActual() {
       }
 
       div.innerHTML = data
-        .map((e, i) => `<p>${i + 1}. ${e.nombre} - ${e.puntaje} pts</p>`)
+        .map((e, i) => `<p>${i + 1}. ${e.nombre} - ${e.puntaje}</p>`)
         .join('');
     })
     .catch(err => console.error('[proyeccion] ❌ Error cargando ranking:', err));
@@ -158,10 +158,10 @@ function renderFinal(ranking) {
 
   const top = Array.isArray(ranking) ? ranking : [];
   DOM.root.innerHTML = `
-    <div class="pregunta-contenido">
+    <div class="pregunta-contenido resultado-final">
       <h1>🏁 Juego finalizado</h1>
-      <ol>
-        ${top.map(r => `<li>${r.nombre} — ${r.puntaje} pts</li>`).join('')}
+      <ol class="ranking-final">
+        ${top.map(r => `<li>${r.nombre} — ${r.puntaje}</li>`).join('')}
       </ol>
     </div>
   `;
