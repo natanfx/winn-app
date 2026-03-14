@@ -5,7 +5,7 @@
 // - Exponer IPC (abrir/cerrar proyección, obtener IP/URL/QR)
 // - Arrancar el backend (Express + Socket.IO + SQLite) UNA sola vez
 
-const { app, BrowserWindow, ipcMain, screen } = require('electron');
+const { app, BrowserWindow, ipcMain, screen, Menu } = require('electron');
 const path = require('path');
 const QRCode = require('qrcode');
 const os = require('os');
@@ -133,10 +133,9 @@ function openProyeccionWindow() {
     width: secundaria.bounds.width,
     height: secundaria.bounds.height,
     show: false,
-    fullscreenable: false,
-    autoHideMenuBar: true,
-    frame: false, // 🔥 elimina barra con cerrar/minimizar
-    resizable: false,
+    minimizable: false,
+  closable: false,
+  resizable: true,
     icon: getAssetPath('assets', 'icons', 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -217,6 +216,8 @@ ipcMain.handle('obtener-datos-conexion', async () => {
 // ------------------------------------------------------------
 
 app.whenReady().then(() => {
+  Menu.setApplicationMenu(null);
+
   // BD en userData (Application Support / AppData), no dentro de la app instalada
   const userDataDir = app.getPath('userData');
   process.env.WINN_DB_PATH = path.join(userDataDir, 'winn.db');
@@ -248,7 +249,7 @@ ipcMain.handle('cerrar-winn', async () => {
     BrowserWindow.getAllWindows().forEach((w) => {
       if (!w.isDestroyed()) w.destroy();
     });
-  } catch {}
+  } catch { }
 
   // Salir
   setTimeout(() => app.exit(0), 150);

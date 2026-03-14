@@ -58,33 +58,26 @@ body {
 
 /* Estilo general del contenedor de espera */
 .pantalla-espera {
-  width: 85%;
   height: 50%;
   position: absolute;
   top: 50%;
   left: 50%;
   background-color: rgba(255, 245, 230, 0.95);
-
-  /* ANTES: padding: 2rem; */
   padding: 3.5rem 4.5rem;
-
   border-radius: 24px;
   text-align: center;
   box-shadow: 0 0 28px rgba(0, 0, 0, 0.25);
-
-  /* Hace que el bloque se vea “grande” en proyector */
-  width: min(900px, 90vw);
-
+  width: min(800px, 90vw);
   animation: entradaSuave 1.2s ease-out forwards, pulso 4s ease-in-out infinite;
   transform: translate(-50%, -50%);
 }
 
 /* QR grande para proyección */
 #qrConexion {
-  width: 520px;
-  height: 520px;
+  width: min(40vh, 55vw);
+  height: auto;
   max-width: 70vw;
-  max-height: 70vw;
+  max-height: 70vh;
   margin: 0 auto 1.2rem;
   display: block;
   animation: zoomQR 2.5s ease-in-out infinite;

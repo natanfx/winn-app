@@ -431,6 +431,8 @@ function inicializarCuestionarios() {
           title: 'Selecciona un cuestionario',
           text: 'Debes elegir un cuestionario para continuar.',
           confirmButtonText: 'Entendido',
+          heightAuto: false,
+          scrollbarPadding: false
         });
         return;
       }
@@ -475,6 +477,8 @@ function inicializarCuestionarios() {
           title: 'Datos inválidos',
           text: 'El título o el tiempo no son válidos. Verifica los campos antes de continuar.',
           confirmButtonText: 'Ok',
+          heightAuto: false,
+          scrollbarPadding: false
         });
         return;
       }
@@ -709,6 +713,8 @@ function inicializarPreguntas() {
           title: 'Pregunta no válida',
           text: 'Debes escribir una pregunta antes de continuar.',
           confirmButtonText: 'Ok',
+          heightAuto: false,
+          scrollbarPadding: false
         });
         return;
       }
@@ -803,6 +809,8 @@ function inicializarRespuestas() {
         title: 'Respuestas incompletas',
         text: 'Todas las respuestas deben contener texto antes de guardar.',
         confirmButtonText: 'Entendido',
+        heightAuto: false,
+        scrollbarPadding: false
       });
       return;
     }
@@ -813,6 +821,8 @@ function inicializarRespuestas() {
         title: 'Respuesta correcta no seleccionada',
         text: 'Debes marcar cuál es la opción correcta antes de guardar.',
         confirmButtonText: 'Ok',
+        heightAuto: false,
+        scrollbarPadding: false
       });
 
       // vibración visual (si existe clase/estructura)
@@ -840,6 +850,8 @@ function inicializarRespuestas() {
           title: 'Respuestas guardadas',
           text: 'Se han guardado correctamente.',
           confirmButtonText: 'Perfecto',
+          heightAuto: false,
+          scrollbarPadding: false
         });
       } else {
         await Swal.fire({
@@ -847,6 +859,8 @@ function inicializarRespuestas() {
           title: 'Error al guardar',
           text: 'No se pudieron guardar las respuestas. Intenta de nuevo.',
           confirmButtonText: 'Ok',
+          heightAuto: false,
+          scrollbarPadding: false
         });
       }
     } catch (err) {
@@ -856,6 +870,8 @@ function inicializarRespuestas() {
         title: 'Error de red',
         text: 'No se pudo contactar al servidor.',
         confirmButtonText: 'Ok',
+        heightAuto: false,
+        scrollbarPadding: false
       });
     }
   });
@@ -874,6 +890,8 @@ function inicializarJuego() {
           title: 'Cuestionario no seleccionado',
           text: 'Por favor, selecciona un cuestionario antes de iniciar.',
           confirmButtonText: 'Ok',
+          heightAuto: false,
+          scrollbarPadding: false
         });
         return;
       }
@@ -885,6 +903,8 @@ function inicializarJuego() {
           title: 'Sin estudiantes conectados',
           text: 'Por favor, espera a que se conecten al menos uno antes de iniciar.',
           confirmButtonText: 'Entendido',
+          heightAuto: false,
+          scrollbarPadding: false
         });
         return;
       }
@@ -923,6 +943,8 @@ function inicializarJuego() {
             title: 'Juego listo',
             text: 'El juego ha sido iniciado correctamente.',
             confirmButtonText: 'Comenzar',
+            heightAuto: false,
+            scrollbarPadding: false
           });
         } else {
           await Swal.fire({
@@ -930,6 +952,8 @@ function inicializarJuego() {
             title: 'Error inesperado',
             text: 'Algo falló al iniciar el juego. Intenta de nuevo.',
             confirmButtonText: 'Ok',
+            heightAuto: false,
+            scrollbarPadding: false
           });
         }
       } catch (err) {
@@ -939,6 +963,8 @@ function inicializarJuego() {
           title: 'Error de conexión',
           text: 'No se pudo contactar con el servidor.',
           confirmButtonText: 'Ok',
+          heightAuto: false,
+          scrollbarPadding: false
         });
       }
     });
@@ -956,6 +982,8 @@ function inicializarJuego() {
             title: 'Juego finalizado',
             text: 'Se han mostrado todas las preguntas.',
             confirmButtonText: 'Aceptar',
+            heightAuto: false,
+            scrollbarPadding: false
           });
         } else {
           await Swal.fire({
@@ -964,6 +992,8 @@ function inicializarJuego() {
             text: 'Todos los dispositivos han recibido la nueva pregunta.',
             timer: 1500,
             showConfirmButton: false,
+            heightAuto: false,
+            scrollbarPadding: false
           });
         }
       } catch (err) {
@@ -972,6 +1002,8 @@ function inicializarJuego() {
           icon: 'error',
           title: 'Error',
           text: 'No se pudo avanzar a la siguiente pregunta. Revisa la conexión.',
+          heightAuto: false,
+          scrollbarPadding: false
         });
       }
     });
@@ -989,6 +1021,8 @@ function inicializarJuego() {
           title: '🏆 Ranking actual',
           html: 'Aún no hay respuestas registradas.',
           confirmButtonText: 'Continuar',
+          heightAuto: false,
+          scrollbarPadding: false
         });
         return;
       }
@@ -1002,6 +1036,8 @@ function inicializarJuego() {
         title: '🏆 Ranking actual',
         html: contenidoHTML,
         confirmButtonText: 'Siguiente pregunta',
+        heightAuto: false,
+        scrollbarPadding: false
       });
     } catch (err) {
       console.error('❌ Error al mostrar ranking en docente:', err);
@@ -1125,6 +1161,8 @@ async function mostrarLanzamientosEnModal(items) {
     inputPlaceholder: 'Selecciona un lanzamiento',
     showCancelButton: true,
     confirmButtonText: 'Ver detalle',
+    heightAuto: false,
+    scrollbarPadding: false
   });
 
   if (value) verDetalleLanzamiento(value);
@@ -1153,10 +1191,14 @@ async function verDetalleLanzamiento(aplicacion) {
       `,
       confirmButtonText: 'Cerrar',
       width: 600,
+      heightAuto: false,
+      scrollbarPadding: false
     });
   } catch (e) {
     console.error('Error detalle lanzamiento:', e);
-    Swal.fire({ icon: 'error', title: 'Error', text: 'No se pudo cargar el detalle.' });
+    Swal.fire({
+      icon: 'error', title: 'Error', text: 'No se pudo cargar el detalle.', heightAuto: false, scrollbarPadding: false
+    });
   }
 }
 
