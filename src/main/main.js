@@ -134,8 +134,8 @@ function openProyeccionWindow() {
     height: secundaria.bounds.height,
     show: false,
     minimizable: false,
-  closable: false,
-  resizable: true,
+    closable: false,
+    resizable: true,
     icon: getAssetPath('assets', 'icons', 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -164,6 +164,7 @@ function openProyeccionWindow() {
 
   proyeccionWindow.on('closed', () => {
     proyeccionWindow = null;
+    permitirCerrarProyeccion = false;
   });
 }
 
@@ -172,9 +173,9 @@ function openProyeccionWindow() {
  */
 function closeProyeccionWindow() {
   if (proyeccionWindow && !proyeccionWindow.isDestroyed()) {
-    permitirCerrarProyeccion = true;
-    proyeccionWindow.close();
+    proyeccionWindow.destroy();
   }
+
   proyeccionWindow = null;
   permitirCerrarProyeccion = false;
 }

@@ -1,6 +1,6 @@
 {
   "name": "winn-app",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "WINN (Work In Not Net) - Aplicación de cuestionarios local tipo Kahoot para aulas sin internet",
   "main": "src/main/main.js",
   "config": {
