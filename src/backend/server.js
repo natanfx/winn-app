@@ -312,12 +312,61 @@ io.on('connection', (socket) => {
    * Fin de pregunta (temporizador) -> ranking.
    * Protegemos para no emitir dos veces.
    */
-  socket.on('fin-pregunta', () => {
-    if (rankingEmitido) return;
-    rankingEmitido = true;
-    console.log('⏱️ Tiempo finalizado: mostrando ranking');
-    io.emit('mostrar-ranking');
+socket.on('fin-pregunta', () => {
+  if (rankingEmitido) return;
+  rankingEmitido = true;
+
+  const preguntaActual = preguntasEnJuego[indicePreguntaActual];
+  if (!preguntaActual) return;
+
+  const respuestaCorrecta = preguntaActual.respuestas.find(
+    r => r.es_correcta === 1
+  );
+
+  // Enviar resultado personalizado a cada estudiante
+  estudiantesConectados.forEach(estudiante => {
+    const respuestaAlumno = respuestasSesion
+      .filter(r =>
+        r.boleta === estudiante.boleta &&
+        r.pregunta_id === preguntaActual.id
+      )
+      .at(-1);
+
+    // No respondió
+    if (!respuestaAlumno) {
+      io.to(estudiante.socketId).emit('resultado-pregunta', {
+        respondio: false,
+        correcta: false,
+        respuestaElegida: null,
+        respuestaCorrecta: respuestaCorrecta?.respuesta || '',
+        puntos: 0
+      });
+
+      return;
+    }
+
+    const respuestaElegida = preguntaActual.respuestas.find(
+      r => r.id === respuestaAlumno.respuesta_id
+    );
+
+    const correcta = respuestaElegida?.es_correcta === 1;
+
+    io.to(estudiante.socketId).emit('resultado-pregunta', {
+      respondio: true,
+      correcta,
+      respuestaElegida: respuestaElegida?.respuesta || '',
+      respuestaCorrecta: respuestaCorrecta?.respuesta || '',
+      puntos: respuestaAlumno.puntaje || 0
+    });
   });
+
+  console.log('⏱️ Tiempo finalizado: mostrando feedback');
+
+  // Esperar 2 segundos antes de mostrar ranking
+  setTimeout(() => {
+    io.emit('mostrar-ranking');
+  }, 5000);
+});
 
   /**
    * Respuesta del estudiante (socket)

@@ -338,13 +338,107 @@
             mostrarPreguntaEstudiante(pregunta);
         });
 
+        socket.on('resultado-pregunta', (resultado) => {
+            if (estadoPantalla === 'final') return;
+
+            limpiarTimers();
+            estadoPantalla = 'resultado';
+
+            const pantalla = document.getElementById('pantalla-estudiante');
+            if (!pantalla) return;
+
+            if (!resultado.respondio) {
+                pantalla.style.backgroundColor = '#f59e0b';
+
+                pantalla.innerHTML = `
+            <div style="text-align:center; padding:24px;">
+                <div style="font-size:4rem;">⏱️</div>
+
+                <h2 style="font-size:2.2rem; margin-bottom:1rem;">
+                    TIEMPO AGOTADO
+                </h2>
+
+                <p style="font-size:1.2rem;">
+                    No registraste una respuesta.
+                </p>
+
+                <p style="font-size:1.2rem; margin-top:1.5rem;">
+                    La respuesta correcta era:
+                </p>
+
+                <p style="font-size:1.7rem; font-weight:bold;">
+                    ${resultado.respuestaCorrecta}
+                </p>
+            </div>
+        `;
+
+                return;
+            }
+
+            if (resultado.correcta) {
+                pantalla.style.backgroundColor = '#16a34a';
+
+                pantalla.innerHTML = `
+                    <div style="text-align:center; padding:24px;">
+                        <div style="font-size:4rem;">✅</div>
+
+                        <h2 style="font-size:2.5rem; margin-bottom:1rem;">
+                            ¡CORRECTA!
+                        </h2>
+
+                        <p style="font-size:1.2rem;">
+                            Respondiste:
+                        </p>
+
+                        <p style="font-size:1.7rem; font-weight:bold;">
+                            ${resultado.respuestaElegida}
+                        </p>
+
+                        <p style="font-size:1.3rem; margin-top:1.5rem;">
+                            +${resultado.puntos} puntos
+                        </p>
+                    </div>
+                `;
+            } else {
+                pantalla.style.backgroundColor = '#dc2626';
+
+                pantalla.innerHTML = `
+                    <div style="text-align:center; padding:24px;">
+                        <div style="font-size:4rem;">❌</div>
+
+                        <h2 style="font-size:2.5rem; margin-bottom:1rem;">
+                            INCORRECTA
+                        </h2>
+
+                        <p style="font-size:1.2rem;">
+                            Respondiste:
+                        </p>
+
+                        <p style="font-size:1.7rem; font-weight:bold;">
+                            ${resultado.respuestaElegida}
+                        </p>
+
+                        <p style="font-size:1.2rem; margin-top:1.5rem;">
+                            La respuesta correcta era:
+                        </p>
+
+                        <p style="font-size:1.7rem; font-weight:bold;">
+                            ${resultado.respuestaCorrecta}
+                        </p>
+                    </div>
+                `;
+            }
+        });
+
         socket.on('mostrar-ranking', () => {
             if (estadoPantalla === 'final') return;
 
             limpiarTimers();
             estadoPantalla = 'ranking';
 
+
             const pantalla = document.getElementById('pantalla-estudiante');
+            pantalla.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
             let enunciado = document.getElementById('enunciadoPregunta');
             let respuestasDiv = document.getElementById('respuestaBtns');
 
@@ -370,6 +464,8 @@
 
             const pantalla = document.getElementById('pantalla-estudiante');
             if (!pantalla) return;
+
+            pantalla.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
 
             // Si el servidor manda ranking, puedes mostrar un top rápido
             if (Array.isArray(ranking) && ranking.length) {
