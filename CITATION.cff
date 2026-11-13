@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "Si usa este software, cítelo como se indica a continuación."
+title: "WINN (Work In No Network)"
+version: 1.2.0
+date-released: "2026-11-13"
+license: MIT
+repository-code: "https://github.com/natanfx/winn-app"
+authors:
+  - family-names: "Belmontes Zacarías"
+    given-names: "Jonatan"
+abstract: "Aplicación de escritorio y servidor local para cuestionarios multiusuario en aulas sin conexión a Internet. Los estudiantes participan desde el navegador de su teléfono mediante la red local."
+keywords:
+  - educación
+  - sin conexión
+  - gamificación
+  - aprendizaje móvil

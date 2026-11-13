@@ -1,6 +1,6 @@
-WINN – Work In Not Net
+WINN – Work In No Network
 
-WINN (Work In Not Net) es una aplicación educativa interactiva diseñada para funcionar sin conexión a internet, orientada a entornos escolares donde la conectividad es limitada o inexistente.
+WINN (Work In No Network) es una aplicación educativa interactiva diseñada para funcionar sin conexión a internet, orientada a entornos escolares donde la conectividad es limitada o inexistente.
 
 El proyecto busca apoyar dinámicas de trabajo en aula mediante actividades digitales locales, priorizando accesibilidad, simplicidad y autonomía tecnológica.
 

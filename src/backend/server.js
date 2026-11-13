@@ -362,7 +362,7 @@ socket.on('fin-pregunta', () => {
 
   console.log('⏱️ Tiempo finalizado: mostrando feedback');
 
-  // Esperar 2 segundos antes de mostrar ranking
+  // Esperar 5 segundos (feedback individual visible) antes de mostrar ranking
   setTimeout(() => {
     io.emit('mostrar-ranking');
   }, 5000);
@@ -380,6 +380,8 @@ socket.on('fin-pregunta', () => {
     //           tiempoLimiteMs, //milisegundos configurados por el docente (pregunta.tiempo_limite * 1000)
     //           tiempoTranscurridoMs //milisegundos muertos, los que el estudiante tardoo en contestar
 
+    // Una sola respuesta por estudiante y pregunta: se descarta antes de puntuar
+    if (respuestasSesion.some(r => r.boleta === estudiante.boleta && r.pregunta_id === pregunta_id)) return;
     // Determinar si es correcta según el banco en RAM
     const respuesta = pregunta.respuestas.find(r => r.id === respuesta_id);
     const esCorrecta = respuesta?.es_correcta === 1;
