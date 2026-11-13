@@ -1,0 +1,23 @@
+{
+  "title": "WINN (Work In No Network)",
+  "upload_type": "software",
+  "description": "WINN es una aplicación de escritorio de código abierto para realizar cuestionarios grupales con ranking en el aula sin necesidad de Internet. El docente ejecuta un servidor local y los estudiantes participan desde el navegador de su propio teléfono en la misma red local, sin instalar nada, sin cuentas y sin consumir datos móviles.",
+  "creators": [
+    {
+      "name": "Belmontes Zacarías, Jonatan",
+      "orcid": "0009-0005-3035-1244"
+    }
+  ],
+  "license": "MIT",
+  "keywords": [
+    "offline-first",
+    "aula sin Internet",
+    "gamificación",
+    "tecnología educativa",
+    "servidor local",
+    "Electron",
+    "Socket.IO"
+  ],
+  "language": "spa",
+  "access_right": "open"
+}
