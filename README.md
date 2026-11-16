@@ -2,7 +2,7 @@
 
 WINN es una aplicación de escritorio para que el docente realice cuestionarios grupales con ranking en el aula **sin necesidad de Internet**. El docente ejecuta WINN en su computadora, que funciona como servidor local, y los estudiantes participan desde el navegador de su propio teléfono, conectados a la misma red local (un router o un punto de acceso sin salida a Internet). Los estudiantes no instalan nada, no crean cuentas y no consumen datos móviles.
 
-[![DOI](https://zenodo.org/badge/DOI/PENDIENTE.svg)](https://doi.org/PENDIENTE)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.24267865.svg)](https://doi.org/10.5281/zenodo.24267865)
 Licencia MIT. Versión actual: **1.2.0**.
 
 ## Cómo funciona
@@ -116,7 +116,7 @@ WINN guarda el nombre y la boleta de los participantes, sus respuestas y puntaje
 
 Si utilizas WINN en un trabajo académico, cítalo con el DOI de Zenodo de la versión que usaste (ver el botón "Cite this repository" de GitHub o el archivo `CITATION.cff`).
 
-Belmontes Zacarías, J. (2026). *WINN (Work In No Network)* (Versión 1.2.0) [Software]. Zenodo. https://doi.org/PENDIENTE
+Belmontes Zacarías, J. (2026). *WINN (Work In No Network)* (Versión 1.2.0) [Software]. Zenodo. https://doi.org/10.5281/zenodo.24267865
 
 ## Licencia
 
