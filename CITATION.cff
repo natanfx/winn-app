@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "Si usa este software, cítelo como se indica a continuación."
 title: "WINN (Work In No Network)"
 version: 1.2.0
-date-released: "2026-11-15"
+date-released: "2026-11-16"
 license: MIT
 doi: 10.5281/zenodo.24267865
 repository-code: "https://github.com/natanfx/winn-app"
